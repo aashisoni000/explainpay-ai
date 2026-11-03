@@ -1,0 +1,28 @@
+{
+  "created_at": "2026-11-03T16:30:51.929214+00:00",
+  "seed": 42,
+  "retrained_models": false,
+  "command": "PYTHONPATH=backend backend/.venv/bin/python reports/ml_analysis/analyze.py",
+  "versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.4",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.8.0",
+    "xgboost": "3.4.1",
+    "shap": "0.50.0",
+    "joblib": "1.6.0"
+  },
+  "datasets": {
+    "fraud": {
+      "source_sha256": "76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89",
+      "artifact_sha256": "d1f941ab9da7a8854035126b58e6b513cf15acd707f9f392c033067731149806",
+      "model_version": "fraud-2026-11-03T15:22:03.224890+00:00"
+    },
+    "phishing": {
+      "source_sha256": "1de48e23501c544b6d345fcdeca544c42f71ab10d3061e174b1d97feafc07db8",
+      "artifact_sha256": "d2f88e8793c814f2d79986985ad765fdd0b994fff9312dd47c5a4b3b5eb5a3d9",
+      "model_version": "phishing-2026-11-03T15:22:10.357687+00:00"
+    }
+  },
+  "scope": "Offline reproducibility audit. Application artifacts and datasets are read-only. No network or provider submissions."
+}

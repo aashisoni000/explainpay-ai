@@ -1,0 +1,300 @@
+{
+  "source": "https://www.kaggle.com/datasets/victusadi/phishing-urls-dataset-with-extracted-features",
+  "dataset": "data/raw/websites/phishing_features.csv",
+  "dataset_sha256": "1de48e23501c544b6d345fcdeca544c42f71ab10d3061e174b1d97feafc07db8",
+  "artifact_sha256": "d2f88e8793c814f2d79986985ad765fdd0b994fff9312dd47c5a4b3b5eb5a3d9",
+  "model_version": "phishing-2026-11-03T15:22:10.357687+00:00",
+  "raw": {
+    "rows": 160064,
+    "columns": [
+      "url",
+      "label",
+      "url_length",
+      "num_dots",
+      "has_https",
+      "has_ip",
+      "num_subdirs",
+      "num_params",
+      "suspicious_words",
+      "tld",
+      "special_char_count",
+      "digits_count",
+      "entropy"
+    ],
+    "missing_values": {
+      "tld": 821
+    },
+    "duplicate_rows": 0,
+    "possible_label_values": {
+      "label": [
+        "1",
+        "0"
+      ],
+      "has_https": [
+        "0",
+        "1"
+      ],
+      "has_ip": [
+        "0",
+        "1"
+      ],
+      "suspicious_words": [
+        "2",
+        "0",
+        "1",
+        "3"
+      ]
+    },
+    "sample_types": {
+      "url": "object",
+      "label": "int64",
+      "url_length": "int64",
+      "num_dots": "int64",
+      "has_https": "int64",
+      "has_ip": "int64",
+      "num_subdirs": "int64",
+      "num_params": "int64",
+      "suspicious_words": "int64",
+      "tld": "object",
+      "special_char_count": "int64",
+      "digits_count": "int64",
+      "entropy": "float64"
+    }
+  },
+  "preparation": {
+    "url_column": "url",
+    "target_column": "label",
+    "label_mapping": {
+      "1": "phishing",
+      "0": "legitimate"
+    },
+    "invalid_urls_removed": 56678,
+    "invalid_url_reasons": {
+      "Invalid website URL: A valid public hostname is required.": 817,
+      "Invalid website URL: Only standard HTTP/HTTPS ports are supported.": 55814,
+      "Invalid website URL: URLs containing credentials are not allowed.": 35,
+      "URL must not contain whitespace, controls, or backslashes.": 9,
+      "URL must contain 1 to 2048 characters.": 3
+    },
+    "duplicate_urls_removed": 122,
+    "features": "Only deterministic URL lexical features; supplied extracted features are not trusted."
+  },
+  "cleaned_rows": 103264,
+  "input_features": [
+    "url_length",
+    "domain_length",
+    "dot_count",
+    "subdomain_count",
+    "hyphen_count",
+    "digit_count",
+    "ip_hostname",
+    "https",
+    "suspicious_tokens",
+    "parameter_count",
+    "suspicious_extension",
+    "url_entropy",
+    "path_length",
+    "at_count",
+    "encoded_count"
+  ],
+  "raw_class_distribution": {
+    "1": 159244,
+    "0": 820
+  },
+  "cleaned_class_distribution": {
+    "1": 102444,
+    "0": 820
+  },
+  "test_prevalence": 0.9920592649978212,
+  "raw_imbalance_majority_to_minority": 194.2,
+  "cleaned_imbalance_majority_to_minority": 124.93170731707318,
+  "splits": {
+    "train": {
+      "size": 61958,
+      "class_distribution": {
+        "1": 61466,
+        "0": 492
+      }
+    },
+    "validation": {
+      "size": 20653,
+      "class_distribution": {
+        "1": 20489,
+        "0": 164
+      }
+    },
+    "test": {
+      "size": 20653,
+      "class_distribution": {
+        "1": 20489,
+        "0": 164
+      }
+    }
+  },
+  "saved_metrics_reproduced": true,
+  "scaler_training_mean_verified": true,
+  "background_verified": true,
+  "parameters": {
+    "selected_model": "xgboost",
+    "classifier": {
+      "objective": "binary:logistic",
+      "base_score": null,
+      "booster": null,
+      "callbacks": null,
+      "colsample_bylevel": null,
+      "colsample_bynode": null,
+      "colsample_bytree": 0.9,
+      "device": null,
+      "early_stopping_rounds": null,
+      "enable_categorical": true,
+      "eval_metric": "logloss",
+      "feature_types": null,
+      "feature_weights": null,
+      "gamma": null,
+      "grow_policy": null,
+      "importance_type": null,
+      "interaction_constraints": null,
+      "learning_rate": 0.06,
+      "max_bin": null,
+      "max_cat_threshold": null,
+      "max_cat_to_onehot": null,
+      "max_delta_step": null,
+      "max_depth": 4,
+      "max_leaves": null,
+      "min_child_weight": null,
+      "missing": "nan",
+      "monotone_constraints": null,
+      "multi_strategy": null,
+      "n_estimators": 200,
+      "n_jobs": 2,
+      "num_parallel_tree": null,
+      "random_state": 42,
+      "reg_alpha": null,
+      "reg_lambda": null,
+      "sampling_method": null,
+      "scale_pos_weight": 0.008004425210685583,
+      "subsample": 0.9,
+      "tree_method": "hist",
+      "validate_parameters": null,
+      "verbosity": null
+    },
+    "scaler": {
+      "copy": true,
+      "with_mean": true,
+      "with_std": true
+    },
+    "anomaly": null
+  },
+  "shap": {
+    "sample_size": 512,
+    "sample_class_distribution": {
+      "1": 508,
+      "0": 4
+    },
+    "sampling": "Stratified held-out test sample, seed42; original feature values retained; no raw URLs exported.",
+    "explainer": "TreeExplainer",
+    "explained_model": "xgboost",
+    "background_size": 100,
+    "units": "log-odds",
+    "maximum_probability_reconstruction_error": 1.301439520595693e-07,
+    "example_selection": "First held-out row in each actual outcome TP/FP/FN/TN; retrospective examples, not random representative cases."
+  },
+  "hostname_overlap": {
+    "train_unique_hostnames": 25349,
+    "validation_unique_hostnames": 10238,
+    "test_unique_hostnames": 10317,
+    "train_test_shared_hostnames": 3749,
+    "test_rows_with_training_hostname": 13840,
+    "test_rows": 20653,
+    "method": "Exact normalized hostname overlap, not registrable-domain grouping; no DNS or website fetch."
+  },
+  "temporal_ranges": null,
+  "constant_input_features": [],
+  "metrics": [
+    {
+      "model": "logistic_regression",
+      "split": "validation",
+      "selected": false,
+      "threshold": 0.02169655080140693,
+      "precision": 0.9992175656511321,
+      "recall": 0.9972668261018107,
+      "f1": 0.9982412428550491,
+      "roc_auc": 0.9983015871693199,
+      "pr_auc": 0.9999864152260661,
+      "false_positive_rate": 0.0975609756097561,
+      "accuracy": 0.99651382365758,
+      "specificity": 0.9024390243902439,
+      "false_negative_rate": 0.0027331738981892723,
+      "tn": 148,
+      "fp": 16,
+      "fn": 56,
+      "tp": 20433,
+      "support": 20653
+    },
+    {
+      "model": "xgboost",
+      "split": "validation",
+      "selected": true,
+      "threshold": 0.014913429506123066,
+      "precision": 0.9982433883087733,
+      "recall": 0.9984869930206453,
+      "f1": 0.9983651758046019,
+      "roc_auc": 0.9987911419452913,
+      "pr_auc": 0.9999901627285464,
+      "false_positive_rate": 0.21951219512195122,
+      "accuracy": 0.9967559192369148,
+      "specificity": 0.7804878048780488,
+      "false_negative_rate": 0.0015130069793547758,
+      "tn": 128,
+      "fp": 36,
+      "fn": 31,
+      "tp": 20458,
+      "support": 20653
+    },
+    {
+      "model": "logistic_regression",
+      "split": "test",
+      "selected": false,
+      "threshold": 0.02169655080140693,
+      "precision": 0.9990218135576641,
+      "recall": 0.9969251793645371,
+      "f1": 0.9979723952607793,
+      "roc_auc": 0.9969025616362854,
+      "pr_auc": 0.9999749318528888,
+      "false_positive_rate": 0.12195121951219512,
+      "accuracy": 0.9959812133830436,
+      "specificity": 0.8780487804878049,
+      "false_negative_rate": 0.0030748206354629312,
+      "tn": 144,
+      "fp": 20,
+      "fn": 63,
+      "tp": 20426,
+      "support": 20653
+    },
+    {
+      "model": "xgboost",
+      "split": "test",
+      "selected": true,
+      "threshold": 0.014913429506123066,
+      "precision": 0.9981946816296657,
+      "recall": 0.9984869930206453,
+      "f1": 0.998340815928167,
+      "roc_auc": 0.9989399427890516,
+      "pr_auc": 0.9999914025196208,
+      "false_positive_rate": 0.22560975609756098,
+      "accuracy": 0.9967075001210478,
+      "specificity": 0.774390243902439,
+      "false_negative_rate": 0.0015130069793547758,
+      "tn": 127,
+      "fp": 37,
+      "fn": 31,
+      "tp": 20458,
+      "support": 20653
+    }
+  ],
+  "unavailable": [
+    "Original Logistic Regression fitted estimator and per-row scores were not saved; only validation/test aggregate results survive.",
+    "No learning curves, epoch histories, calibration study, group/temporal holdout, external validation, or confidence intervals were saved.",
+    "Isolation Forest was fit, but no anomaly-specific ground truth, evaluation metrics, or tuning experiment was saved."
+  ]
+}

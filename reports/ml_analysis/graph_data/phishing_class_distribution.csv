@@ -1,0 +1,5 @@
+population,class_label,class_name,count,proportion
+raw,0,Legitimate,820,0.005122950819672131
+raw,1,Phishing,159244,0.9948770491803278
+cleaned,0,Legitimate,820,0.00794081189959715
+cleaned,1,Phishing,102444,0.9920591881004028

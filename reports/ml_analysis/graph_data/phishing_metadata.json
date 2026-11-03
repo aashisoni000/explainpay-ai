@@ -1,0 +1,10 @@
+{
+  "selected_model": "xgboost",
+  "test_prevalence": 0.9920592649978212,
+  "cleaned_class_distribution": {
+    "1": 102444,
+    "0": 820
+  },
+  "shap_sample_size": 512,
+  "shap_sample_description": "Stratified held-out test sample, seed42; original feature values retained; no raw URLs exported."
+}

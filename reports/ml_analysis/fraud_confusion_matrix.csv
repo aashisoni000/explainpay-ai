@@ -1,0 +1,5 @@
+model,split,tn,fp,fn,tp,threshold
+logistic_regression,validation,56640,11,17,77,0.9999999210373394
+xgboost,validation,56639,12,13,81,0.9687055945396423
+logistic_regression,test,56642,9,25,70,0.9999999210373394
+xgboost,test,56643,8,24,71,0.9687055945396423

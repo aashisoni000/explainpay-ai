@@ -1,0 +1,340 @@
+{
+  "source": "https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud",
+  "dataset": "data/raw/transactions/creditcard.csv",
+  "dataset_sha256": "76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89",
+  "artifact_sha256": "d1f941ab9da7a8854035126b58e6b513cf15acd707f9f392c033067731149806",
+  "model_version": "fraud-2026-11-03T15:22:03.224890+00:00",
+  "raw": {
+    "rows": 284807,
+    "columns": [
+      "Time",
+      "V1",
+      "V2",
+      "V3",
+      "V4",
+      "V5",
+      "V6",
+      "V7",
+      "V8",
+      "V9",
+      "V10",
+      "V11",
+      "V12",
+      "V13",
+      "V14",
+      "V15",
+      "V16",
+      "V17",
+      "V18",
+      "V19",
+      "V20",
+      "V21",
+      "V22",
+      "V23",
+      "V24",
+      "V25",
+      "V26",
+      "V27",
+      "V28",
+      "Amount",
+      "Class"
+    ],
+    "missing_values": {},
+    "duplicate_rows": 1081,
+    "possible_label_values": {
+      "Class": [
+        "0",
+        "1"
+      ]
+    },
+    "sample_types": {
+      "Time": "float64",
+      "V1": "float64",
+      "V2": "float64",
+      "V3": "float64",
+      "V4": "float64",
+      "V5": "float64",
+      "V6": "float64",
+      "V7": "float64",
+      "V8": "float64",
+      "V9": "float64",
+      "V10": "float64",
+      "V11": "float64",
+      "V12": "float64",
+      "V13": "float64",
+      "V14": "float64",
+      "V15": "float64",
+      "V16": "float64",
+      "V17": "float64",
+      "V18": "float64",
+      "V19": "float64",
+      "V20": "float64",
+      "V21": "float64",
+      "V22": "float64",
+      "V23": "float64",
+      "V24": "float64",
+      "V25": "float64",
+      "V26": "float64",
+      "V27": "float64",
+      "V28": "float64",
+      "Amount": "float64",
+      "Class": "int64"
+    }
+  },
+  "preparation": {
+    "duplicates_removed": 1081,
+    "label_mapping": {
+      "0": "legitimate",
+      "1": "fraud"
+    },
+    "features": "V1-V28 are anonymized PCA components; original merchant identity is unavailable."
+  },
+  "cleaned_rows": 283726,
+  "input_features": [
+    "Time",
+    "V1",
+    "V2",
+    "V3",
+    "V4",
+    "V5",
+    "V6",
+    "V7",
+    "V8",
+    "V9",
+    "V10",
+    "V11",
+    "V12",
+    "V13",
+    "V14",
+    "V15",
+    "V16",
+    "V17",
+    "V18",
+    "V19",
+    "V20",
+    "V21",
+    "V22",
+    "V23",
+    "V24",
+    "V25",
+    "V26",
+    "V27",
+    "V28",
+    "Amount"
+  ],
+  "raw_class_distribution": {
+    "0": 284315,
+    "1": 492
+  },
+  "cleaned_class_distribution": {
+    "0": 283253,
+    "1": 473
+  },
+  "test_prevalence": 0.0016741268107003137,
+  "raw_imbalance_majority_to_minority": 577.8760162601626,
+  "cleaned_imbalance_majority_to_minority": 598.8435517970402,
+  "splits": {
+    "train": {
+      "size": 170235,
+      "class_distribution": {
+        "0": 169951,
+        "1": 284
+      }
+    },
+    "validation": {
+      "size": 56745,
+      "class_distribution": {
+        "0": 56651,
+        "1": 94
+      }
+    },
+    "test": {
+      "size": 56746,
+      "class_distribution": {
+        "0": 56651,
+        "1": 95
+      }
+    }
+  },
+  "saved_metrics_reproduced": true,
+  "scaler_training_mean_verified": true,
+  "background_verified": true,
+  "parameters": {
+    "selected_model": "xgboost",
+    "classifier": {
+      "objective": "binary:logistic",
+      "base_score": null,
+      "booster": null,
+      "callbacks": null,
+      "colsample_bylevel": null,
+      "colsample_bynode": null,
+      "colsample_bytree": 0.9,
+      "device": null,
+      "early_stopping_rounds": null,
+      "enable_categorical": true,
+      "eval_metric": "logloss",
+      "feature_types": null,
+      "feature_weights": null,
+      "gamma": null,
+      "grow_policy": null,
+      "importance_type": null,
+      "interaction_constraints": null,
+      "learning_rate": 0.06,
+      "max_bin": null,
+      "max_cat_threshold": null,
+      "max_cat_to_onehot": null,
+      "max_delta_step": null,
+      "max_depth": 4,
+      "max_leaves": null,
+      "min_child_weight": null,
+      "missing": "nan",
+      "monotone_constraints": null,
+      "multi_strategy": null,
+      "n_estimators": 200,
+      "n_jobs": 2,
+      "num_parallel_tree": null,
+      "random_state": 42,
+      "reg_alpha": null,
+      "reg_lambda": null,
+      "sampling_method": null,
+      "scale_pos_weight": 598.419014084507,
+      "subsample": 0.9,
+      "tree_method": "hist",
+      "validate_parameters": null,
+      "verbosity": null
+    },
+    "scaler": {
+      "copy": true,
+      "with_mean": true,
+      "with_std": true
+    },
+    "anomaly": {
+      "bootstrap": false,
+      "contamination": 0.01,
+      "max_features": 1.0,
+      "max_samples": 4096,
+      "n_estimators": 100,
+      "n_jobs": 2,
+      "random_state": 42,
+      "verbose": 0,
+      "warm_start": false
+    }
+  },
+  "shap": {
+    "sample_size": 512,
+    "sample_class_distribution": {
+      "0": 511,
+      "1": 1
+    },
+    "sampling": "Stratified held-out test sample, seed42; original feature values retained; no raw URLs exported.",
+    "explainer": "TreeExplainer",
+    "explained_model": "xgboost",
+    "background_size": 100,
+    "units": "log-odds",
+    "maximum_probability_reconstruction_error": 6.544666117380693e-08,
+    "example_selection": "First held-out row in each actual outcome TP/FP/FN/TN; retrospective examples, not random representative cases."
+  },
+  "hostname_overlap": null,
+  "temporal_ranges": {
+    "train": {
+      "time_min": 0.0,
+      "time_max": 172788.0
+    },
+    "validation": {
+      "time_min": 0.0,
+      "time_max": 172792.0
+    },
+    "test": {
+      "time_min": 2.0,
+      "time_max": 172786.0
+    }
+  },
+  "constant_input_features": [],
+  "metrics": [
+    {
+      "model": "logistic_regression",
+      "split": "validation",
+      "selected": false,
+      "threshold": 0.9999999210373394,
+      "precision": 0.875,
+      "recall": 0.8191489361702128,
+      "f1": 0.8461538461538461,
+      "roc_auc": 0.9790382284664183,
+      "pr_auc": 0.7876165501786713,
+      "false_positive_rate": 0.0001941713297205698,
+      "accuracy": 0.9995065644550181,
+      "specificity": 0.9998058286702795,
+      "false_negative_rate": 0.18085106382978725,
+      "tn": 56640,
+      "fp": 11,
+      "fn": 17,
+      "tp": 77,
+      "support": 56745
+    },
+    {
+      "model": "xgboost",
+      "split": "validation",
+      "selected": true,
+      "threshold": 0.9687055945396423,
+      "precision": 0.8709677419354839,
+      "recall": 0.8617021276595744,
+      "f1": 0.8663101604278075,
+      "roc_auc": 0.9746735987458861,
+      "pr_auc": 0.8690718841034963,
+      "false_positive_rate": 0.00021182326878607614,
+      "accuracy": 0.9995594325491233,
+      "specificity": 0.9997881767312139,
+      "false_negative_rate": 0.13829787234042554,
+      "tn": 56639,
+      "fp": 12,
+      "fn": 13,
+      "tp": 81,
+      "support": 56745
+    },
+    {
+      "model": "logistic_regression",
+      "split": "test",
+      "selected": false,
+      "threshold": 0.9999999210373394,
+      "precision": 0.8860759493670886,
+      "recall": 0.7368421052631579,
+      "f1": 0.8045977011494253,
+      "roc_auc": 0.9645615955123197,
+      "pr_auc": 0.6865099817074168,
+      "false_positive_rate": 0.00015886745158955713,
+      "accuracy": 0.9994008388256441,
+      "specificity": 0.9998411325484104,
+      "false_negative_rate": 0.2631578947368421,
+      "tn": 56642,
+      "fp": 9,
+      "fn": 25,
+      "tp": 70,
+      "support": 56746
+    },
+    {
+      "model": "xgboost",
+      "split": "test",
+      "selected": true,
+      "threshold": 0.9687055945396423,
+      "precision": 0.8987341772151899,
+      "recall": 0.7473684210526316,
+      "f1": 0.8160919540229885,
+      "roc_auc": 0.9673979834053191,
+      "pr_auc": 0.8000485449058653,
+      "false_positive_rate": 0.00014121551252405077,
+      "accuracy": 0.9994360836006062,
+      "specificity": 0.999858784487476,
+      "false_negative_rate": 0.25263157894736843,
+      "tn": 56643,
+      "fp": 8,
+      "fn": 24,
+      "tp": 71,
+      "support": 56746
+    }
+  ],
+  "unavailable": [
+    "Original Logistic Regression fitted estimator and per-row scores were not saved; only validation/test aggregate results survive.",
+    "No learning curves, epoch histories, calibration study, group/temporal holdout, external validation, or confidence intervals were saved.",
+    "Isolation Forest was fit, but no anomaly-specific ground truth, evaluation metrics, or tuning experiment was saved."
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "sample_size": 512,
+  "sample_class_distribution": {
+    "0": 511,
+    "1": 1
+  },
+  "sampling": "Stratified held-out test sample, seed42; original feature values retained; no raw URLs exported.",
+  "explainer": "TreeExplainer",
+  "explained_model": "xgboost",
+  "background_size": 100,
+  "units": "log-odds",
+  "maximum_probability_reconstruction_error": 6.544666117380693e-08,
+  "example_selection": "First held-out row in each actual outcome TP/FP/FN/TN; retrospective examples, not random representative cases."
+}

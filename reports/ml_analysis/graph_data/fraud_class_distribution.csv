@@ -1,0 +1,5 @@
+population,class_label,class_name,count,proportion
+raw,0,Legitimate,284315,0.9982725143693799
+raw,1,Fraud,492,0.001727485630620034
+cleaned,0,Legitimate,283253,0.9983328986416472
+cleaned,1,Fraud,473,0.001667101358352777

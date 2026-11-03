@@ -1,0 +1,14 @@
+feature,dtype,missing_count,missing_percent
+url,object,0,0.0
+label,int64,0,0.0
+url_length,int64,0,0.0
+num_dots,int64,0,0.0
+has_https,int64,0,0.0
+has_ip,int64,0,0.0
+num_subdirs,int64,0,0.0
+num_params,int64,0,0.0
+suspicious_words,int64,0,0.0
+tld,object,821,0.5129198320671731
+special_char_count,int64,0,0.0
+digits_count,int64,0,0.0
+entropy,float64,0,0.0

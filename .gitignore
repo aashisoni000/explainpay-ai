@@ -53,6 +53,13 @@ __pycache__/
 /backend/storage/
 /backend/.postgres/
 
+# Row-level research exports stay local; aggregate tables and figures can be shared.
+/reports/ml_analysis/graph_data/*_split_assignments.csv
+/reports/ml_analysis/graph_data/*_heldout_scores.csv
+/reports/ml_analysis/shap_analysis/*_values.csv
+/reports/ml_analysis/shap_analysis/*_examples.csv
+/reports/ml_analysis/new_experiments/
+
 # vercel
 .vercel
 

@@ -1,0 +1,60 @@
+task,feature,meaning,population
+fraud,Time,Seconds elapsed since the first source transaction; random splits overlap in time.,source
+fraud,V1,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V2,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V3,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V4,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V5,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V6,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V7,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V8,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V9,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V10,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V11,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V12,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V13,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V14,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V15,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V16,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V17,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V18,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V19,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V20,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V21,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V22,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V23,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V24,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V25,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V26,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V27,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,V28,"Anonymized PCA component. Original variable, loadings and semantic interpretation are unavailable.",source
+fraud,Amount,Source transaction amount; upstream ULB documentation describes euros. Application conservatively displays supplied amount without assuming currency for arbitrary uploads.,source
+fraud,Class,"Binary target: 1 fraudulent, 0 legitimate. Excluded from model inputs.",source
+phishing,url,Source URL string; normalized and validated before feature recomputation.,source
+phishing,label,"Publisher encoding: 1 phishing, 0 benign.",source
+phishing,url_length,Publisher: total source URL length; NOT used directly by the trained pipeline.,source
+phishing,num_dots,Publisher: number of dots; extractor details not included in repository.,source
+phishing,has_https,Publisher: HTTPS indicator; source values not used in inference.,source
+phishing,has_ip,Publisher: IP-in-URL indicator; differs from our hostname parser.,source
+phishing,num_subdirs,Publisher: slash count; not an actual parsed subdomain count.,source
+phishing,num_params,"Publisher: question-mark/ampersand count, not our parsed parameter pairs.",source
+phishing,suspicious_words,Publisher suspicious-token feature; exact source token list unavailable.,source
+phishing,tld,"Publisher top-level domain; 821 missing values, unused by selected preprocessing.",source
+phishing,special_char_count,Publisher count of -_%@=~ characters; source implementation not saved.,source
+phishing,digits_count,Publisher digit count; source implementation not saved.,source
+phishing,entropy,Publisher URL entropy; source normalization details unavailable.,source
+phishing,url_length,"Character count of normalized URL, including scheme and query; fragment removed.",recomputed_model_input
+phishing,domain_length,Length of normalized ASCII/IDNA hostname.,recomputed_model_input
+phishing,dot_count,"Dot characters anywhere in normalized URL, not only hostname.",recomputed_model_input
+phishing,subdomain_count,"max(hostname dot-separated labels minus 2, 0); 0 for IP. Not public-suffix-aware.",recomputed_model_input
+phishing,hyphen_count,Hyphens anywhere in normalized URL.,recomputed_model_input
+phishing,digit_count,Characters for which Python str.isdigit() is true in normalized URL.,recomputed_model_input
+phishing,ip_hostname,1 if hostname parses as a public IP; otherwise 0.,recomputed_model_input
+phishing,https,1 for normalized HTTPS scheme; encryption is not a safety guarantee.,recomputed_model_input
+phishing,suspicious_tokens,"Count of distinct substrings present: login, verify, secure, account, update, bank, wallet, password.",recomputed_model_input
+phishing,parameter_count,"Parsed query pairs, including blank values, using urllib.parse.parse_qsl.",recomputed_model_input
+phishing,suspicious_extension,"Path ends with .exe, .zip, .scr, .apk, or .js, case insensitive.",recomputed_model_input
+phishing,url_entropy,Shannon character entropy (bits/character) of normalized URL.,recomputed_model_input
+phishing,path_length,Character count of URL path (default /).,recomputed_model_input
+phishing,at_count,@ characters anywhere; credential URLs are already rejected.,recomputed_model_input
+phishing,encoded_count,Percent-sign characters; this is not a validated count of encoded bytes.,recomputed_model_input
