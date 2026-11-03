@@ -306,10 +306,25 @@ def analyze(kind: str, out: Path, sample_size: int) -> dict[str, Any]:
         "anomaly": artifact["anomaly"].get_params() if artifact.get("anomaly") is not None else None,
     }
     write_json(out / "graph_data" / f"{kind}_parameters.json", parameters)
+    if artifact["model_name"] == "xgboost":
+        write_json(
+            out / "graph_data" / f"{kind}_booster_config.json",
+            json.loads(artifact["pipeline"].named_steps["model"].get_booster().save_config()),
+        )
     temporal = None
     if kind == "fraud":
         temporal = {name: {"time_min": float(frame.Time.min()), "time_max": float(frame.Time.max())} for name, frame in splits.items()}
     domains = domain_audit(raw, features, splits) if kind == "phishing" else None
+    feature_keys = pd.MultiIndex.from_frame(features)
+    train_keys = pd.MultiIndex.from_frame(splits["train"])
+    test_keys = pd.MultiIndex.from_frame(splits["test"])
+    overlap = {
+        "duplicate_feature_rows_excluding_target": int(features.duplicated().sum()),
+        "distinct_feature_vectors_with_conflicting_labels": len(feature_keys[labels == 0].intersection(feature_keys[labels == 1])),
+        "test_rows_with_exact_training_feature_vector": int(test_keys.isin(train_keys).sum()),
+        "test_rows": len(test_keys),
+        "method": "Exact equality of the complete ordered model-input vector; target excluded.",
+    }
     result = {
         "source": SOURCES[kind], "dataset": str(dataset.relative_to(ROOT)), "dataset_sha256": saved["dataset_sha256"],
         "artifact_sha256": digest(model_directory() / f"{kind}.joblib"), "model_version": artifact["version"],
@@ -322,6 +337,7 @@ def analyze(kind: str, out: Path, sample_size: int) -> dict[str, Any]:
         "splits": {name: {"size": len(frame), "class_distribution": {str(label): int(count) for label, count in targets[name].value_counts().items()}} for name, frame in splits.items()},
         "saved_metrics_reproduced": True, "scaler_training_mean_verified": True, "background_verified": True,
         "parameters": parameters, "shap": shap_meta, "hostname_overlap": domains, "temporal_ranges": temporal,
+        "feature_vector_overlap": overlap,
         "constant_input_features": [feature for feature in features if features[feature].nunique() == 1],
         "metrics": rows,
         "unavailable": [
@@ -350,6 +366,13 @@ def main() -> None:
         "command": "PYTHONPATH=backend backend/.venv/bin/python reports/ml_analysis/analyze.py",
         "versions": {"python": platform.python_version(), **{name: importlib.metadata.version(name) for name in ("numpy", "pandas", "scikit-learn", "xgboost", "shap", "joblib")}},
         "datasets": {kind: {"source_sha256": item["dataset_sha256"], "artifact_sha256": item["artifact_sha256"], "model_version": item["model_version"]} for kind, item in report.items()},
+        "source_code_sha256": {
+            str(path.relative_to(ROOT)): digest(path)
+            for path in (
+                ROOT / "backend/app/ml/train.py", ROOT / "backend/app/ml/runtime.py",
+                ROOT / "backend/app/ml/urls.py", Path(__file__).resolve(),
+            )
+        },
         "scope": "Offline reproducibility audit. Application artifacts and datasets are read-only. No network or provider submissions.",
     }
     write_json(args.output / "manifest.json", manifest)

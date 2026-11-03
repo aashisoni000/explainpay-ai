@@ -107,17 +107,25 @@ and saved investigations remain on disk/in PostgreSQL.
 - [Troubleshooting](#troubleshooting)
 - [Validation](#validation)
 - [Verified local dataset evaluation](#verified-local-dataset-evaluation)
+- [ML research pack and visualisations](#ml-research-pack-and-visualisations)
 - [Limitations and deployment](#limitations-and-deployment)
 
 ## Architecture
 
-```text
-Next.js 16 / TypeScript / Tailwind 4 / Lucide
-                  | typed REST requests
-FastAPI / Pydantic / SQLAlchemy / Alembic
-       |                  |                 |
-PostgreSQL 16      local trained models    optional trusted APIs
-                  sklearn/XGBoost/SHAP    VirusTotal/Web Risk/RDAP
+```mermaid
+flowchart LR
+    Browser["Next.js 16 / React / TypeScript"]
+    Proxy["Same-origin /backend proxy"]
+    API["FastAPI / Pydantic"]
+    DB[("PostgreSQL / SQLAlchemy / Alembic")]
+    Fraud["Fraud model + SHAP + anomaly signal"]
+    Phishing["Shared URL features / phishing model + SHAP"]
+    Providers["Optional VirusTotal / Web Risk / RDAP"]
+    Browser --> Proxy --> API
+    API --> DB
+    API --> Fraud
+    API --> Phishing
+    API -. "only when configured" .-> Providers
 ```
 
 ```text
@@ -467,6 +475,35 @@ mixed with synthetic training examples.
 Full reproducible results, confusion matrices, baseline comparisons, input
 hashes, rejection reasons, and limitations are saved under ignored
 `data/models/*.metrics.json` and displayed on `/settings`.
+
+## ML research pack and visualisations
+
+The complete evidence-backed technical pack is in
+`reports/ml_analysis/`:
+
+- `technical_content.md` (full research narrative)
+- `dataset_summary.md` (dataset/schema/statistics audit)
+- `final_audit.md` (limitations, missing experiments, exact commands)
+- `architecture.md` (implemented Mermaid workflows)
+- `figures/captions.csv` (all generated figure captions)
+
+Reproduce analysis and figures:
+
+```bash
+backend/.venv/bin/python -m pip install -r reports/ml_analysis/requirements.lock
+PYTHONPATH=backend backend/.venv/bin/python reports/ml_analysis/analyze.py
+backend/.venv/bin/python reports/ml_analysis/write_summaries.py
+backend/.venv/bin/python reports/ml_analysis/graph_generation.py
+backend/.venv/bin/python -m pytest reports/ml_analysis/test_analysis.py -q
+```
+
+Selected generated figures:
+
+![Fraud model comparison](reports/ml_analysis/figures/fraud/fraud_model_metrics_test.png)
+![Fraud confusion matrices](reports/ml_analysis/figures/fraud/fraud_confusion_test_models.png)
+![Phishing model comparison](reports/ml_analysis/figures/phishing/phishing_model_metrics_test.png)
+![Phishing confusion matrices](reports/ml_analysis/figures/phishing/phishing_confusion_test_models.png)
+![Phishing class distribution](reports/ml_analysis/figures/phishing/phishing_class_distribution.png)
 
 ## Limitations and deployment
 

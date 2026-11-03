@@ -249,6 +249,13 @@
       "time_max": 172786.0
     }
   },
+  "feature_vector_overlap": {
+    "duplicate_feature_rows_excluding_target": 0,
+    "distinct_feature_vectors_with_conflicting_labels": 0,
+    "test_rows_with_exact_training_feature_vector": 0,
+    "test_rows": 56746,
+    "method": "Exact equality of the complete ordered model-input vector; target excluded."
+  },
   "constant_input_features": [],
   "metrics": [
     {

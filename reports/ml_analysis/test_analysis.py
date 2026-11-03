@@ -1,5 +1,6 @@
 """Verify exported research assets against their recorded evidence."""
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -68,3 +69,7 @@ def test_artifacts_not_retrained() -> None:
     manifest = json.loads((HERE / "manifest.json").read_text())
     assert manifest["retrained_models"] is False
     assert manifest["seed"] == 42
+    root = HERE.parents[1]
+    for kind, evidence in manifest["datasets"].items():
+        with (root / "data/models" / f"{kind}.joblib").open("rb") as handle:
+            assert hashlib.file_digest(handle, "sha256").hexdigest() == evidence["artifact_sha256"]

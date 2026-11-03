@@ -1,0 +1,35 @@
+file,caption
+figures/fraud/fraud_class_distribution.png,Fraud dataset class counts before and after cleaning.
+figures/fraud/fraud_missing_values.png,Fraud missing-value counts by feature.
+figures/fraud/fraud_feature_distributions.png,Fraud cleaned per-class distributions for top model-important numerical features.
+figures/fraud/fraud_correlation_top12.png,Fraud Pearson correlation heatmap for top 12 connected features.
+figures/fraud/fraud_class_comparison.png,Fraud feature-level class comparison using median and IQR.
+figures/fraud/fraud_confusion_test_models.png,Fraud test confusion matrices for both trained candidates.
+figures/fraud/fraud_roc_selected.png,Fraud selected-model ROC curve on held-out test data.
+figures/fraud/fraud_pr_selected.png,Fraud selected-model precision-recall curve on held-out test data.
+figures/fraud/fraud_model_metrics_test.png,Fraud held-out test metrics for both candidate models.
+figures/fraud/fraud_precision_recall_f1_test.png,"Fraud precision, recall, and F1 comparison across candidates."
+figures/fraud/fraud_shap_importance_top12.png,Fraud global feature importance from mean absolute SHAP values.
+figures/fraud/fraud_gain_importance_top12.png,Fraud XGBoost gain importance for top features.
+figures/fraud/fraud_shap_beeswarm_top10.png,Fraud SHAP beeswarm for top features on sampled held-out rows.
+figures/fraud/fraud_waterfall_tp.png,Fraud TP example with top SHAP feature contributions.
+figures/fraud/fraud_waterfall_fp.png,Fraud FP example with top SHAP feature contributions.
+figures/fraud/fraud_waterfall_fn.png,Fraud FN example with top SHAP feature contributions.
+figures/fraud/fraud_waterfall_tn.png,Fraud TN example with top SHAP feature contributions.
+figures/phishing/phishing_class_distribution.png,Phishing dataset class counts before and after cleaning.
+figures/phishing/phishing_missing_values.png,Phishing missing-value counts by feature.
+figures/phishing/phishing_feature_distributions.png,Phishing cleaned per-class distributions for top model-important numerical features.
+figures/phishing/phishing_correlation_top12.png,Phishing Pearson correlation heatmap for top 12 connected features.
+figures/phishing/phishing_class_comparison.png,Phishing feature-level class comparison using median and IQR.
+figures/phishing/phishing_confusion_test_models.png,Phishing test confusion matrices for both trained candidates.
+figures/phishing/phishing_roc_selected.png,Phishing selected-model ROC curve on held-out test data.
+figures/phishing/phishing_pr_selected.png,Phishing selected-model precision-recall curve on held-out test data.
+figures/phishing/phishing_model_metrics_test.png,Phishing held-out test metrics for both candidate models.
+figures/phishing/phishing_precision_recall_f1_test.png,"Phishing precision, recall, and F1 comparison across candidates."
+figures/phishing/phishing_shap_importance_top12.png,Phishing global feature importance from mean absolute SHAP values.
+figures/phishing/phishing_gain_importance_top12.png,Phishing XGBoost gain importance for top features.
+figures/phishing/phishing_shap_beeswarm_top10.png,Phishing SHAP beeswarm for top features on sampled held-out rows.
+figures/phishing/phishing_waterfall_tp.png,Phishing TP example with top SHAP feature contributions.
+figures/phishing/phishing_waterfall_fp.png,Phishing FP example with top SHAP feature contributions.
+figures/phishing/phishing_waterfall_fn.png,Phishing FN example with top SHAP feature contributions.
+figures/phishing/phishing_waterfall_tn.png,Phishing TN example with top SHAP feature contributions.

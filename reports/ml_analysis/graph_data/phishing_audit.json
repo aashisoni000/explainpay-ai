@@ -209,6 +209,13 @@
     "method": "Exact normalized hostname overlap, not registrable-domain grouping; no DNS or website fetch."
   },
   "temporal_ranges": null,
+  "feature_vector_overlap": {
+    "duplicate_feature_rows_excluding_target": 35927,
+    "distinct_feature_vectors_with_conflicting_labels": 100,
+    "test_rows_with_exact_training_feature_vector": 8291,
+    "test_rows": 20653,
+    "method": "Exact equality of the complete ordered model-input vector; target excluded."
+  },
   "constant_input_features": [],
   "metrics": [
     {

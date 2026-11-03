@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-03T16:30:51.929214+00:00",
+  "created_at": "2026-11-03T16:44:11.157327+00:00",
   "seed": 42,
   "retrained_models": false,
   "command": "PYTHONPATH=backend backend/.venv/bin/python reports/ml_analysis/analyze.py",
@@ -23,6 +23,12 @@
       "artifact_sha256": "d2f88e8793c814f2d79986985ad765fdd0b994fff9312dd47c5a4b3b5eb5a3d9",
       "model_version": "phishing-2026-11-03T15:22:10.357687+00:00"
     }
+  },
+  "source_code_sha256": {
+    "backend/app/ml/train.py": "81cdec104c0399fc193490a9470c03a5ab1c17f176c71d621918eba1c58c74be",
+    "backend/app/ml/runtime.py": "67793ef928fcbb1b4498f04b18ba0d885895a7151ad744dbda990141d734774a",
+    "backend/app/ml/urls.py": "1c7809837aed1aefc4fd04b901b7b008b7a7c08df41e0baa066655b7eef78b28",
+    "reports/ml_analysis/analyze.py": "643cb098f7d4ca0f39c607af7bfa22c16c9246e1003489e284c4eff9012a8426"
   },
   "scope": "Offline reproducibility audit. Application artifacts and datasets are read-only. No network or provider submissions."
 }
