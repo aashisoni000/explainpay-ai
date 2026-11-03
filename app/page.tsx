@@ -16,7 +16,7 @@ export default function Home() {
         </header>
 
         <main className="flex flex-1 flex-col items-center justify-center py-16 sm:py-20">
-          <div className="text-center">
+          <div className="hero-copy text-center">
             <h1 className="text-[clamp(2.5rem,5.4vw,4.5rem)] leading-[1.08] font-normal tracking-[-0.055em] text-white">
               Know the risk.
               <br />
@@ -29,7 +29,7 @@ export default function Home() {
 
           <section
             aria-labelledby="selection-heading"
-            className="mt-12 w-full max-w-3xl border border-white/20 bg-black/30 p-4 sm:mt-14 sm:p-6"
+            className="mt-12 w-full max-w-3xl border border-white/20 bg-black/60 p-4 sm:mt-14 sm:p-6"
           >
             <div className="mb-5 flex items-center gap-3 sm:mb-6">
               <span aria-hidden="true" className="size-1 bg-neutral-400" />

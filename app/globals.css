@@ -23,3 +23,7 @@ body {
   background: #ededed;
   color: #000000;
 }
+
+.hero-copy {
+  text-shadow: 0 2px 16px #000000, 0 1px 3px #000000;
+}

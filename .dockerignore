@@ -1,0 +1,13 @@
+.git
+.env
+.env.*
+!.env.example
+node_modules
+.next
+.venv
+backend/.venv
+backend/storage
+data
+**/__pycache__
+.pytest_cache
+kaggle.json

@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
 
 # next.js
 /.next/
@@ -32,6 +34,24 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+kaggle.json
+
+# private datasets and generated ML artifacts
+/data/raw/
+/data/processed/
+/data/models/
+
+# Python and local runtime artifacts
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.db
+/backend/storage/
+/backend/.postgres/
 
 # vercel
 .vercel
