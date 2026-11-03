@@ -12,6 +12,103 @@ Anomalies, phishing predictions, and external threat findings are distinct.
 No known detections does not establish safety. This application does not replace
 professional fraud investigation or cybersecurity services.
 
+## How to run (existing local setup)
+
+**`npm run dev` starts only the frontend. PostgreSQL and the Python API must
+also be running.** Run commands below from the repository root.
+Dependencies, database migrations, and models only need setup once; do not
+retrain models every time you start the app.
+
+### 1. Start PostgreSQL
+
+Use the database installation configured in your `.env`:
+
+```bash
+# Current macOS Homebrew setup
+brew services start postgresql@16
+pg_isready
+```
+
+If you configured the Docker alternative instead:
+
+```bash
+docker compose up -d --wait postgres
+```
+
+Use one database setup, not both. `DATABASE_URL` must point to that database.
+
+### 2. Terminal 1: start the backend
+
+```bash
+backend/.venv/bin/python -m uvicorn app.main:app --app-dir backend \
+  --host 127.0.0.1 --port 8001
+```
+
+Leave this terminal running. API documentation:
+http://127.0.0.1:8001/docs.
+
+### 3. Terminal 2: start the frontend
+
+```bash
+npm run dev
+```
+
+Leave this terminal running and open **the URL printed by Next.js**, normally
+http://localhost:3000. If port 3000 is occupied, Next.js may select another port.
+Do not open an older frontend instance by mistake.
+
+The relevant `.env` values are:
+
+```dotenv
+NEXT_PUBLIC_API_URL=/backend
+BACKEND_API_URL=http://127.0.0.1:8001
+```
+
+The frontend forwards `/backend/api/...` to Python. Do not put a direct localhost
+API URL in the browser configuration unless deliberately bypassing this proxy.
+
+### 4. Verify everything is ready
+
+In another terminal:
+
+```bash
+# Python API must return {"status":"ok"}
+curl --fail http://127.0.0.1:8001/api/health
+
+# Change port 3000 here if Next.js printed a different frontend port.
+curl --fail http://localhost:3000/backend/api/system/status
+```
+
+System status should report `database.available: true`,
+`models.fraud.available: true`, and `models.phishing.available: true`.
+Optional threat providers can be `not_configured` or `disabled`.
+The same information is visible at `/settings`.
+
+To try transaction analysis, upload
+`data/processed/ulb_sample_transactions.csv`, not the full training CSV.
+Generate this local sample using the command in [Workflows and API](#workflows-and-api)
+if it is missing.
+
+### Stopping and restarting
+
+Press `Ctrl+C` in each application terminal to stop it. Next time, ensure
+PostgreSQL is running and repeat the two application commands. Existing models
+and saved investigations remain on disk/in PostgreSQL.
+
+## Contents
+
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [First-time setup](#first-time-setup)
+- [Real Kaggle datasets](#real-kaggle-datasets)
+- [Training](#training)
+- [Production frontend and container](#production-frontend-and-container)
+- [Workflows and API](#workflows-and-api)
+- [Troubleshooting](#troubleshooting)
+- [Validation](#validation)
+- [Verified local dataset evaluation](#verified-local-dataset-evaluation)
+- [Limitations and deployment](#limitations-and-deployment)
+
 ## Architecture
 
 ```text
@@ -44,11 +141,15 @@ CLAUDE.md             Project-specific engineering rules
 - PostgreSQL 16+, or Docker Compose.
 - Network access on the initial Next.js build to retrieve Geist.
 
-## Setup
+## First-time setup
+
+Skip this section when dependencies, `.env`, migrations, and models already
+exist. **Do not overwrite an existing `.env`.**
 
 ```bash
 npm ci
-cp .env.example .env
+# Only for a new checkout without .env:
+cp -n .env.example .env
 mkdir -p data/raw/transactions data/raw/websites
 uv venv --python 3.12 backend/.venv
 uv pip install --python backend/.venv/bin/python -r backend/requirements.lock
@@ -203,29 +304,17 @@ they are not bundled in the repository. Unit tests use explicitly
 labelled temporary synthetic fixtures to verify mechanics; those are not
 Kaggle training results and are never copied into production artifacts.
 
-## Run
+## Production frontend and container
 
-In separate terminals:
-
-```bash
-# API: http://127.0.0.1:8001, docs: http://127.0.0.1:8001/docs
-backend/.venv/bin/python -m uvicorn app.main:app --app-dir backend \
-  --host 127.0.0.1 --port 8001
-
-# Frontend: http://localhost:3000
-npm run dev
-```
-
-If port 8001 is occupied, select a free API port and update `BACKEND_API_URL`
-in `.env`, then restart/rebuild the frontend. Leave `NEXT_PUBLIC_API_URL=/backend`
-so browsers always connect through the frontend instead of their own localhost.
-
-Production frontend:
+Instead of `npm run dev`, use:
 
 ```bash
 npm run build
 npm run start
 ```
+
+PostgreSQL and the Python API still need to run separately. Do not run
+`npm run dev` and `npm run start` on the same frontend port.
 
 The optional backend image can be built with
 `docker build -f backend/Dockerfile -t explainpay-api .`.
@@ -267,6 +356,7 @@ GET  /api/transactions/metrics       GET  /api/transactions/{id}
 GET  /api/transactions/uploads/{id}
 POST /api/websites/scan              GET  /api/websites/history
 GET  /api/websites/{id}
+GET  /api/websites/metrics
 GET  /api/investigations             GET  /api/investigations/{id}
 GET  /api/reports                    POST /api/reports/generate
 GET  /api/reports/{id}/download
@@ -276,13 +366,29 @@ Health checks do not imply model availability; inspect system status separately.
 External providers use fixed trusted API hosts with timeouts, never the submitted
 website itself. An unconfigured check is not a negative finding.
 
+## Troubleshooting
+
+| Symptom | Check / fix |
+|---|---|
+| "Cannot reach the ExplainPay API" | Start Python in Terminal 1. Check direct API health, then `/backend/api/health` on the frontend URL. Keep both terminals open. |
+| `/backend/api/...` returns 502/500 | The frontend proxy cannot reach Python. Confirm `BACKEND_API_URL` matches Uvicorn's host and port. |
+| API returns 404 on port 8000 | This project uses port **8001** by default; port 8000 may belong to another application. |
+| Database unavailable / connection refused | Start PostgreSQL and verify `DATABASE_URL`. Apply Alembic migrations during first-time setup. |
+| Model unavailable (503) | Train the missing model using [Training](#training), confirm `MODEL_DIR`, then restart Python. |
+| Address already in use | Reuse the correct running instance or stop it in its own terminal. If changing the API port, update `BACKEND_API_URL` and restart the frontend. |
+| Old error remains after configuration changes | Restart the frontend and reload the page; public environment values and rewrites are loaded at startup/build time. |
+| CSV rejected as too large | Upload the generated sample or another valid CSV within the 10 MiB / 5,000-row limits. |
+| Provider is not configured | Optional API keys are absent; local model prediction still works. This does not mean a website is safe. |
+
+Never kill unrelated services or remove saved data to resolve a port conflict.
+
 ## Validation
 
 ```bash
 npm run lint
 npx tsc --noEmit
 npm run build
-npm run test:e2e
+node --test frontend-tests/workspace.test.mjs
 PYTHONPATH=backend backend/.venv/bin/python -m pytest backend/tests -q
 backend/.venv/bin/ruff check backend
 ```
@@ -298,10 +404,28 @@ TEST_DATABASE_URL='postgresql+psycopg:///explainpay_test?host=/tmp' \
 Tests without a configured integration database may skip database-dependent
 cases; a skipped test is not a verified persistence flow.
 
-Playwright tests expect the frontend on `http://127.0.0.1:3000` and API on
-`http://localhost:8000`. Start both first. If Chromium is missing, run
-`npx playwright install chromium`. Override `E2E_BASE_URL` when using a
-different frontend origin and `E2E_API_URL` when using a different API origin.
+Playwright tests expect the frontend on `http://127.0.0.1:3000`.
+Start the API against a disposable test database and the frontend separately:
+
+```bash
+# Apply migrations to the test database.
+DATABASE_URL='postgresql+psycopg:///explainpay_test?host=/tmp' \
+  backend/.venv/bin/python -m alembic -c backend/alembic.ini upgrade head
+
+# Test API terminal (stop any existing ExplainPay API on port 8001 first).
+DATABASE_URL='postgresql+psycopg:///explainpay_test?host=/tmp' \
+  backend/.venv/bin/python -m uvicorn app.main:app --app-dir backend \
+  --host 127.0.0.1 --port 8001
+
+# Separate test-runner terminal; frontend must already be running.
+E2E_API_URL=http://127.0.0.1:8001 npm run test:e2e
+```
+
+These database URLs are macOS local socket examples; use your test database's
+actual credentials/host for Docker or other installations.
+If Chromium is missing, run `npx playwright install chromium`.
+Override `E2E_BASE_URL` for a different frontend origin and `E2E_API_URL`
+for a different API origin.
 Workspace browser tests create an explicitly labelled synthetic upload to test
 validation/persistence. Run the API against a disposable test database for
 these tests. Workspace tests check the actual model availability rather than
