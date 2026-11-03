@@ -1,3 +1,4 @@
+import json
 import uuid
 from datetime import UTC, datetime
 from typing import Annotated, Any
@@ -88,8 +89,13 @@ class FindingOut(BaseModel):
     finding_type: str
     severity: str
     description: str
-    evidence: dict[str, Any]
+    evidence: str
     source: str
+
+    @field_validator("evidence", mode="before")
+    @classmethod
+    def evidence_text(cls, value: Any) -> str:
+        return value if isinstance(value, str) else json.dumps(value, sort_keys=True)
 
 
 class ProviderOut(BaseModel):

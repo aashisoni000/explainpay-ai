@@ -48,13 +48,14 @@ export interface WebsiteScan {
   normalized_domain: string;
   ml_probability: number;
   ml_prediction: number;
+  base_value?: number;
   risk_level: string;
   threshold: number;
   explanation: Contribution[];
   features: Record<string, number>;
   model_version: string;
   scan_status: string;
-  findings: { finding_type: string; severity: string; description: string; evidence: string; source: string }[];
+  findings: { finding_type: string; severity: string; description: string; evidence: Record<string, unknown> | string; source: string }[];
   providers: { name: string; status: string; details: Record<string, unknown> }[];
   created_at: string;
 }

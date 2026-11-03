@@ -7,7 +7,16 @@ import { ReportActions } from "@/components/workspace/report-actions";
 
 export default function WebsiteDetail() {
   const { id } = useParams<{ id: string }>();
-  const load = useCallback(() => api.website(id), [id]);
+  const load = useCallback(async () => {
+    const scan = await api.website(id);
+    return {
+      ...scan,
+      findings: scan.findings.map((finding) => ({
+        ...finding,
+        evidence: typeof finding.evidence === "string" ? finding.evidence : JSON.stringify(finding.evidence, null, 2),
+      })),
+    };
+  }, [id]);
   const { data, error, loading, reload } = useResource(load);
   if (loading) return <Loading />;
   if (error) return <ErrorNotice error={error} retry={reload} />;

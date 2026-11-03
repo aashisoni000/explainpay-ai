@@ -12,9 +12,8 @@ from sqlalchemy.orm import Session
 BACKEND = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND))
 
-from alembic.config import Config
-
 from alembic import command
+from alembic.config import Config
 from app.database import get_db
 from app.main import app
 

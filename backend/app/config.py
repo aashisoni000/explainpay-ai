@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     )
 
     database_url: str = ""
+    model_dir: str = "data/models"
     max_upload_bytes: int = Field(default=10 * 1024 * 1024, ge=1, le=50 * 1024 * 1024)
     max_upload_rows: int = Field(default=5000, ge=1, le=5000)
     virustotal_api_key: str = ""

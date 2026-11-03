@@ -5,6 +5,7 @@ import csv
 import hashlib
 import json
 import platform
+from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -109,11 +110,13 @@ def prepare_phishing(
     valid_urls: list[str] = []
     valid_labels: list[int] = []
     rejected = 0
+    rejection_reasons: Counter[str] = Counter()
     for value, label in zip(frame[url_column], labels, strict=True):
         try:
             normalized = normalize_url(str(value).strip())
-        except ValueError:
+        except ValueError as error:
             rejected += 1
+            rejection_reasons[str(error)] += 1
             continue
         valid_urls.append(normalized)
         valid_labels.append(int(label == positive_label))
@@ -130,6 +133,7 @@ def prepare_phishing(
         "target_column": target_column,
         "label_mapping": {positive_label: "phishing", negative_label: "legitimate"},
         "invalid_urls_removed": rejected,
+        "invalid_url_reasons": dict(rejection_reasons),
         "duplicate_urls_removed": before - len(data),
         "features": "Only deterministic URL lexical features; supplied extracted features are not trusted.",
     }
@@ -210,6 +214,8 @@ def fit_models(features: pd.DataFrame, labels: pd.Series, kind: str) -> dict[str
         "test_comparison": test_scores,
         "split": {"train": len(train), "validation": len(validation), "test": len(test), "seed": SEED},
         "class_distribution": {str(label): int(count) for label, count in labels.value_counts().items()},
+        "positive_class_prevalence": float(labels.mean()),
+        "test_average_precision_baseline": float(y_test.mean()),
         "scale_pos_weight": weight,
         "explanation_units": "SHAP contributions are log-odds, not probability percentage points.",
         "limitations": [
@@ -219,6 +225,12 @@ def fit_models(features: pd.DataFrame, labels: pd.Series, kind: str) -> dict[str
             "Anomaly detection is separate from supervised fraud classification.",
         ],
     }
+    if kind == "phishing":
+        report["limitations"].extend([
+            "URL-only lexical classification cannot verify webpage content or establish website safety.",
+            "Only standard-port public HTTP/HTTPS inputs are supported; excluded training URLs limit coverage.",
+            "A high phishing prevalence inflates positive-class precision, F1, and PR-AUC; inspect benign false-positive rate.",
+        ])
     return {
         "pipeline": pipeline,
         "features": list(features.columns),
@@ -231,7 +243,7 @@ def fit_models(features: pd.DataFrame, labels: pd.Series, kind: str) -> dict[str
 
 
 def train(args: argparse.Namespace) -> dict[str, Any]:
-    path = Path(args.path) if args.path else ROOT / "data/raw" / ("transactions/creditcard.csv" if args.kind == "fraud" else "websites/phishing_urls.csv")
+    path = Path(args.path) if args.path else ROOT / "data/raw" / ("transactions/creditcard.csv" if args.kind == "fraud" else "websites/phishing_features.csv")
     frame = read_dataset(path)
     inspection = inspect_dataset(frame)
     if args.inspect:
@@ -260,6 +272,7 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
         "dataset_sha256": digest.hexdigest(),
         "inspection": inspection,
         "preparation": preparation,
+        "label_source": getattr(args, "label_source", None),
         "versions": {"python": platform.python_version(), "sklearn": sklearn.__version__},
     })
     output = Path(args.output) if args.output else model_directory()
@@ -285,6 +298,7 @@ def main() -> None:
     parser.add_argument("--target-column")
     parser.add_argument("--positive-label")
     parser.add_argument("--negative-label")
+    parser.add_argument("--label-source", help="Documentation verifying the selected source label encoding.")
     parser.add_argument("--output")
     args = parser.parse_args()
     try:

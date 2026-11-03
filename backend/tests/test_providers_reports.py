@@ -2,11 +2,11 @@ import uuid
 from datetime import UTC, datetime
 
 import httpx
-
-from app import schemas
 from app.config import get_settings
 from app.providers import check_providers, provider_status
 from app.reports import generate_pdf
+
+from app import schemas
 
 
 def test_no_provider_network_without_configuration(monkeypatch):

@@ -3,10 +3,9 @@ import csv
 import io
 
 import pytest
-from fastapi import HTTPException, UploadFile
-
 from app.config import get_settings
 from app.uploads import REQUIRED_COLUMNS, parse_upload, validate_row
+from fastapi import HTTPException, UploadFile
 
 
 def csv_data(rows=None, headers=None):

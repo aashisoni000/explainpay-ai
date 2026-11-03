@@ -38,6 +38,7 @@ export const api = {
   health: () => request<{ status: "ok" }>("/api/health"),
   status: () => request<SystemStatus>("/api/system/status"),
   metrics: () => request<ModelMetrics>("/api/transactions/metrics"),
+  websiteMetrics: () => request<ModelMetrics>("/api/websites/metrics"),
   uploads: () => request<TransactionUpload[]>("/api/transactions/history"),
   upload: (id: string) => request<UploadDetail>(`/api/transactions/uploads/${encodeURIComponent(id)}`),
   analyze: (upload_id: string) => post<UploadDetail>("/api/transactions/analyze", { upload_id }),

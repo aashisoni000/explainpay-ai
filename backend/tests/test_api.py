@@ -1,7 +1,12 @@
+import json
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
+from app.database import get_db
+from app.main import app
+from app.ml import runtime
+from app.uploads import REQUIRED_COLUMNS
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from sqlalchemy.exc import OperationalError
@@ -9,10 +14,6 @@ from sqlalchemy.orm import Session
 from test_uploads import csv_data
 
 from app import models
-from app.database import get_db
-from app.main import app
-from app.ml import runtime
-from app.uploads import REQUIRED_COLUMNS
 
 
 def prediction(row):
@@ -159,6 +160,12 @@ def test_single_prediction_and_required_fields(client, predicted):
     assert client.post(
         "/api/transactions/predict", json={"features": {**features, "Time": -1}}
     ).status_code == 422
+    for invalid_number in (True, False, "1", "NaN", "Infinity"):
+        invalid = client.post(
+            "/api/transactions/predict",
+            json={"features": {**features, "V2": invalid_number}},
+        )
+        assert invalid.status_code == 422, invalid.text
     assert client.post(
         "/api/transactions/predict",
         json={"features": features, "merchant_url": "http://localhost"},
@@ -237,7 +244,7 @@ def test_website_persistence_and_provider_status(client, monkeypatch):
     response = client.post("/api/websites/scan", json={"url": "https://example.com"})
     assert response.status_code == 200, response.text
     scan = response.json()
-    assert scan["findings"][0]["evidence"]["suspicious"] == 1
+    assert json.loads(scan["findings"][0]["evidence"])["suspicious"] == 1
     assert scan["providers"][0]["status"] == "unavailable"
     assert client.get(f"/api/websites/{scan['id']}").json() == scan
     assert client.get("/api/websites/history").json()[0] == scan

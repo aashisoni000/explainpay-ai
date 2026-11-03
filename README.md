@@ -31,7 +31,7 @@ backend/app/          API, persistence, services, and ML
 backend/app/ml/       Shared preprocessing, training, inference, SHAP
 backend/tests/        API, database, report, validation, and ML tests
 data/raw/transactions/creditcard.csv
-data/raw/websites/phishing_urls.csv
+data/raw/websites/phishing_features.csv
 data/models/          Ignored artifacts and actual evaluation JSON
 docker-compose.yml    Local PostgreSQL only
 CLAUDE.md             Project-specific engineering rules
@@ -110,7 +110,7 @@ The application does **not** download datasets automatically.
    place `creditcard.csv` in `data/raw/transactions/`.
 2. [Phishing URLs with extracted features](https://www.kaggle.com/datasets/victusadi/phishing-urls-dataset-with-extracted-features):
    place the actual CSV in `data/raw/websites/`. Use `--path` if its name differs
-   from `phishing_urls.csv`.
+   from `phishing_features.csv`.
 
 If using the optional Kaggle CLI, install it separately, configure your Kaggle
 token through its official credential mechanism, and never put `kaggle.json`
@@ -138,7 +138,7 @@ label encodings:
 export PYTHONPATH=backend
 backend/.venv/bin/python -m app.ml.train fraud --inspect
 backend/.venv/bin/python -m app.ml.train phishing --inspect \
-  --path data/raw/websites/phishing_urls.csv
+  --path data/raw/websites/phishing_features.csv
 ```
 
 Train the fraud model:
@@ -147,16 +147,16 @@ Train the fraud model:
 PYTHONPATH=backend backend/.venv/bin/python -m app.ml.train fraud
 ```
 
-For phishing, replace the following placeholders with the **observed** schema
-and labels; do not assume that `1` means phishing:
+For the inspected `phishing_features.csv`, the publisher explicitly documents
+`url`, `label`, `1 = Phishing`, and `0 = Benign`. Other datasets require fresh
+schema and label verification:
 
 ```bash
 PYTHONPATH=backend backend/.venv/bin/python -m app.ml.train phishing \
-  --path data/raw/websites/phishing_urls.csv \
-  --url-column '<observed URL column>' \
-  --target-column '<observed target column>' \
-  --positive-label '<observed phishing label>' \
-  --negative-label '<observed legitimate label>'
+  --path data/raw/websites/phishing_features.csv \
+  --url-column url --target-column label \
+  --positive-label 1 --negative-label 0 \
+  --label-source https://www.kaggle.com/datasets/victusadi/phishing-urls-dataset-with-extracted-features
 ```
 
 Each command writes `<kind>.joblib` and `<kind>.metrics.json` to `data/models/`.
@@ -194,7 +194,8 @@ invented predictions.
 Risk is `low` below the learned threshold, `medium` when flagged, and `high`
 when flagged with estimated probability at least 0.8. Risk is triage, not proof.
 
-No real models or performance metrics are bundled. Unit tests use explicitly
+Real artifacts and evaluation JSON are generated locally and excluded from Git;
+they are not bundled in the repository. Unit tests use explicitly
 labelled temporary synthetic fixtures to verify mechanics; those are not
 Kaggle training results and are never copied into production artifacts.
 
@@ -210,6 +211,10 @@ backend/.venv/bin/python -m uvicorn app.main:app --app-dir backend \
 # Frontend: http://localhost:3000
 npm run dev
 ```
+
+If port 8000 is occupied, use `--port 8001` and set
+`NEXT_PUBLIC_API_URL=http://127.0.0.1:8001` in `.env`, then restart/rebuild the
+frontend. The current local setup uses port 8001 to avoid another service.
 
 Production frontend:
 
@@ -298,9 +303,44 @@ validation/persistence. Run the API against a disposable test database for
 these tests. Missing-model browser cases require untrained-model mode; they do
 not claim positive model predictions were tested against real Kaggle artifacts.
 
+## Verified local dataset evaluation
+
+Both actual user-downloaded datasets were inspected and trained on 2026-11-03.
+XGBoost was selected by validation PR-AUC for both tasks; thresholds were selected
+by validation F1, not tuned using the test results below.
+
+| Held-out test metric | Transaction fraud | URL phishing |
+|---|---:|---:|
+| Precision | 0.898734 | 0.998195 |
+| Recall | 0.747368 | 0.998487 |
+| F1 | 0.816092 | 0.998341 |
+| PR-AUC (average precision) | 0.800049 | 0.999991 |
+| ROC-AUC | 0.967398 | 0.998940 |
+| False-positive rate | 0.000141 | 0.225610 |
+| Threshold | 0.968706 | 0.014913 |
+
+Fraud source: 284,807 rows; 1,081 duplicate inputs removed.
+Phishing source: 160,064 rows; 56,678 unsupported URLs removed (55,814 used
+nonstandard ports), then 122 normalized duplicates removed, leaving 102,444
+phishing and only 820 benign URLs. The 821 missing pre-extracted `tld` values
+are irrelevant because training recomputes all lexical features from the URL.
+
+**Phishing limitations are material:** the held-out benign false-positive rate is
+22.56% (37 of 164 benign URLs), despite the very high positive-class metrics.
+The approximately 99.2% phishing prevalence makes PR-AUC/F1 look unusually strong.
+These results do not establish broad real-world website trustworthiness.
+Random URL splits may share domains; nonstandard-port sites are outside supported
+inference coverage. Original data was not altered, balanced artificially, or
+mixed with synthetic training examples.
+
+Full reproducible results, confusion matrices, baseline comparisons, input
+hashes, rejection reasons, and limitations are saved under ignored
+`data/models/*.metrics.json` and displayed on `/settings`.
+
 ## Limitations and deployment
 
-- Real training and evaluation remain blocked until both Kaggle CSVs are present.
+- On a fresh checkout, download the datasets and train both models before
+  prediction. Generated local artifacts are intentionally not committed.
 - External providers require keys/network access; RDAP is opt-in.
 - No authentication is included in this academic local demo. Bind to loopback.
   Before public deployment add identity/authorization, rate limiting, TLS,

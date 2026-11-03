@@ -22,10 +22,14 @@ test("scanner validates input and displays actual missing-model errors", async (
   const input = page.getByRole("textbox", { name: "Website URL" });
   await input.fill("https://example.com");
   await page.getByRole("button", { name: "Analyze website" }).click();
-  await expect(page.getByRole("main").getByRole("alert")).toContainText(/model unavailable|model.*not.*available|Train it/i);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(/API 503: Required ML model is unavailable; train and configure its artifacts/);
 });
 
-test("actual CSV upload persists preview and model absence is explicit", async ({ page }) => {
+test("CSV upload persists preview and reports actual model state", async ({ page, request }) => {
+  const apiUrl = process.env.E2E_API_URL ?? "http://localhost:8000";
+  const status = await request.get(`${apiUrl}/api/system/status`);
+  expect(status.ok()).toBe(true);
+  const system = await status.json();
   await page.goto("/transactions");
   const columns = ["Time", ...Array.from({ length: 28 }, (_, i) => `V${i + 1}`), "Amount"];
   const csv = `${columns.join(",")}\n${columns.map((key) => key === "Amount" ? "12.5" : "0").join(",")}\n`;
@@ -39,7 +43,13 @@ test("actual CSV upload persists preview and model absence is explicit", async (
   await expect(page.getByRole("button", { name: "Analyze transactions" })).toBeVisible();
   await expect(page.getByText("SYNTHETIC_BROWSER_TEST_ONLY.csv").first()).toBeVisible();
   await page.getByRole("button", { name: "Analyze transactions" }).click();
-  await expect(page.getByRole("main").getByRole("alert")).toContainText(/model unavailable|model.*not.*available|Train it/i);
+  if (system.models.fraud.available) {
+    await expect(page.getByRole("heading", { name: "Transaction results" })).toBeVisible();
+    await page.getByRole("link", { name: /^Explain / }).first().click();
+    await expect(page.getByRole("heading", { name: "Feature contributions" })).toBeVisible();
+  } else {
+    await expect(page.getByRole("main").getByRole("alert")).toContainText(/API 503: Required ML model is unavailable; train and configure its artifacts/);
+  }
 });
 
 test("API network failures have visible error states", async ({ page }) => {
