@@ -12,17 +12,32 @@ test("workspace navigation and mobile menu are functional", async ({ page }) => 
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
 });
 
-test("scanner validates input and displays actual missing-model errors", async ({ page, request }) => {
+test("scanner submits and respects actual model availability", async ({ page, request }) => {
   const apiUrl = process.env.E2E_API_URL ?? "http://localhost:8000";
   const status = await request.get(`${apiUrl}/api/system/status`);
   expect(status.ok()).toBe(true);
   const system = await status.json();
-  test.skip(system.models.phishing.available, "Requires missing-model mode; real model is available.");
   await page.goto("/website-scanner");
   const input = page.getByRole("textbox", { name: "Website URL" });
   await input.fill("https://example.com");
   await page.getByRole("button", { name: "Analyze website" }).click();
-  await expect(page.getByRole("main").getByRole("alert")).toContainText(/API 503: Required ML model is unavailable; train and configure its artifacts/);
+  if (system.models.phishing.available) {
+    await expect(page).toHaveURL(/\/website-scanner\/[a-f0-9-]+$/);
+    await expect(page.getByRole("heading", { name: "Feature contributions" })).toBeVisible();
+  } else {
+    await expect(page.getByRole("main").getByRole("alert")).toContainText(/API 503: Required ML model is unavailable; train and configure its artifacts/);
+  }
+});
+
+test("scanner rejects malformed and private URLs without creating a scan", async ({ page }) => {
+  await page.goto("/website-scanner");
+  await page.getByRole("textbox", { name: "Website URL" }).fill("not a url");
+  await page.getByRole("button", { name: "Analyze website" }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("Enter a complete HTTP or HTTPS URL");
+  await page.getByRole("textbox", { name: "Website URL" }).fill("http://127.0.0.1");
+  await page.getByRole("button", { name: "Analyze website" }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(/private|local|public/i);
+  await expect(page).toHaveURL(/\/website-scanner$/);
 });
 
 test("CSV upload persists preview and reports actual model state", async ({ page, request }) => {

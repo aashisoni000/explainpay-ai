@@ -1,6 +1,6 @@
 import type { Investigation, ModelMetrics, Report, SystemStatus, TransactionResult, TransactionUpload, UploadDetail, WebsiteScan } from "../types/api";
 
-export const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/+$/, "");
+export const API_URL = (process.env.NEXT_PUBLIC_API_URL || "/backend").replace(/\/+$/, "");
 
 export class ApiError extends Error {
   public readonly status: number;
@@ -43,7 +43,7 @@ export const api = {
   upload: (id: string) => request<UploadDetail>(`/api/transactions/uploads/${encodeURIComponent(id)}`),
   analyze: (upload_id: string) => post<UploadDetail>("/api/transactions/analyze", { upload_id }),
   transaction: (id: string) => request<TransactionResult>(`/api/transactions/${encodeURIComponent(id)}`),
-  predict: (features: Record<string, number>, merchant_url?: string) => post<TransactionResult>("/predict", { features, ...(merchant_url ? { merchant_url } : {}) }),
+  predict: (features: Record<string, number>, merchant_url?: string) => post<TransactionResult>("/api/transactions/predict", { features, ...(merchant_url ? { merchant_url } : {}) }),
   scan: (url: string) => post<WebsiteScan>("/api/websites/scan", { url }),
   scans: () => request<WebsiteScan[]>("/api/websites/history"),
   website: (id: string) => request<WebsiteScan>(`/api/websites/${encodeURIComponent(id)}`),

@@ -55,6 +55,20 @@ test("analysis uses exact JSON contract and encodes resource IDs", async () => {
   await api.upload("a/b");
 });
 
+test("single prediction and phishing metrics use real backend routes", async () => {
+  const calls = [];
+  mock.method(globalThis, "fetch", async (url, init) => {
+    calls.push(url);
+    if (init.method === "POST") {
+      assert.deepEqual(JSON.parse(init.body), { features: { Amount: 1 }, merchant_url: "https://example.com" });
+    }
+    return Response.json({});
+  });
+  await api.predict({ Amount: 1 }, "https://example.com");
+  await api.websiteMetrics();
+  assert.deepEqual(calls, [`${API_URL}/api/transactions/predict`, `${API_URL}/api/websites/metrics`]);
+});
+
 test("503 preserves backend detail and status; network failure is explicit", async () => {
   mock.method(globalThis, "fetch", async () => Response.json({ detail: "Fraud dataset unavailable" }, { status: 503 }));
   await assert.rejects(request("/test"), (error) => error instanceof ApiError && error.status === 503 && error.message === "Fraud dataset unavailable");

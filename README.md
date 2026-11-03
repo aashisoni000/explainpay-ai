@@ -87,7 +87,8 @@ The application does not silently create tables on startup.
 | Variable | Purpose |
 |---|---|
 | `DATABASE_URL` | SQLAlchemy PostgreSQL connection URL |
-| `NEXT_PUBLIC_API_URL` | Browser-visible API origin; default `http://localhost:8000` |
+| `NEXT_PUBLIC_API_URL` | Browser API prefix; default `/backend` (same-origin proxy) |
+| `BACKEND_API_URL` | Server-side proxy target; default `http://127.0.0.1:8001` |
 | `CORS_ORIGINS` | JSON array of allowed frontend origins |
 | `MODEL_DIR` | Trusted local model directory; default `data/models` |
 | `STORAGE_DIR` | Generated report storage |
@@ -98,8 +99,11 @@ The application does not silently create tables on startup.
 | `RDAP_ENABLED` | Opt into domain registration lookup |
 | `TEST_DATABASE_URL` | Dedicated PostgreSQL database for integration tests |
 
-Changing `NEXT_PUBLIC_API_URL` requires restarting development or rebuilding
-production. API keys belong only in the backend environment, never `NEXT_PUBLIC_*`.
+Changing either API URL requires restarting development or rebuilding production.
+The browser uses `/backend/api/...` on the frontend origin; Next.js proxies it
+to FastAPI. This avoids browser localhost, mixed-content, and CORS issues when
+accessing the frontend through a forwarded port. FastAPI must still be running.
+API keys belong only in the backend environment, never `NEXT_PUBLIC_*`.
 Optional services report not-configured/unavailable explicitly.
 
 ## Real Kaggle datasets
@@ -204,17 +208,17 @@ Kaggle training results and are never copied into production artifacts.
 In separate terminals:
 
 ```bash
-# API: http://localhost:8000, docs: http://localhost:8000/docs
+# API: http://127.0.0.1:8001, docs: http://127.0.0.1:8001/docs
 backend/.venv/bin/python -m uvicorn app.main:app --app-dir backend \
-  --host 127.0.0.1 --port 8000
+  --host 127.0.0.1 --port 8001
 
 # Frontend: http://localhost:3000
 npm run dev
 ```
 
-If port 8000 is occupied, use `--port 8001` and set
-`NEXT_PUBLIC_API_URL=http://127.0.0.1:8001` in `.env`, then restart/rebuild the
-frontend. The current local setup uses port 8001 to avoid another service.
+If port 8001 is occupied, select a free API port and update `BACKEND_API_URL`
+in `.env`, then restart/rebuild the frontend. Leave `NEXT_PUBLIC_API_URL=/backend`
+so browsers always connect through the frontend instead of their own localhost.
 
 Production frontend:
 
@@ -300,8 +304,11 @@ Playwright tests expect the frontend on `http://127.0.0.1:3000` and API on
 different frontend origin and `E2E_API_URL` when using a different API origin.
 Workspace browser tests create an explicitly labelled synthetic upload to test
 validation/persistence. Run the API against a disposable test database for
-these tests. Missing-model browser cases require untrained-model mode; they do
-not claim positive model predictions were tested against real Kaggle artifacts.
+these tests. Workspace tests check the actual model availability rather than
+substituting responses. The real-model suite requires local trained artifacts
+and the generated ULB sample; it verifies predictions, SHAP views, persisted
+history, PDF bytes, and both evaluation reports. Missing-model errors are also
+covered by backend tests.
 
 ## Verified local dataset evaluation
 
